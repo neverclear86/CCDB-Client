@@ -56,6 +56,30 @@ local function getUser(name, pass)
     return name, pass
   end
 end
+
+local error = {
+  result = false,
+  detail = {
+    name = "ConnectionError",
+    message = "Connection to server failed."
+  }
+}
+
+local function getResponse(h)
+  if h then
+    return json.decode(h.readAll())
+  else
+    return error
+  end
+end
+
+local function get(url, header)
+  return getResponse(http.get(url, header))
+end
+
+local function post(url, params, header)
+  return getResponse(http.post(url, params, header))
+end
 --------------------------------------------------------------------------
 ---
 -- 正規表現オペレータ生成
@@ -118,8 +142,7 @@ function ccdb.find(collection, query, name, pass)
     "&password=" .. pass ..
     "&collection=" .. collection ..
     "&query=" .. json.encode(query)
-  local h = http.get(url .. "/db/find/?" .. param)
-  return json.decode(h.readAll())
+  return get(url .. "/db/find/?" .. param)
 end
 
 ---
@@ -136,8 +159,7 @@ function ccdb.insert(collection, data, name, pass)
     "&password=" .. pass ..
     "&collection=" .. collection ..
     "&data=" .. json.encode(data)
-  local h = http.post(url .. "/db/insert/", param)
-  return json.decode(h.readAll())
+  return post(url .. "/db/insert/", param)
 end
 
 ---
@@ -158,8 +180,7 @@ function ccdb.update(collection, selector, data, name, pass)
     "&selector=" .. json.encode(selector) ..
     "&data=" .. json.encode(data)
 
-  local h = http.post(url .. "/db/update/", param)
-  return json.decode(h.readAll())
+  return post(url .. "/db/update/", param)
 end
 
 ---
@@ -177,8 +198,7 @@ function ccdb.delete(collection, filter, name, pass)
     "&collection=" .. collection ..
     "&filter=" .. json.encode(filter)
 
-  local h = http.post(url .. "/db/delete/", param)
-  return json.decode(h.readAll())
+  return post(url .. "/db/delete/", param)
 end
 
 return ccdb
