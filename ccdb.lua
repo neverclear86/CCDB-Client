@@ -6,9 +6,9 @@
 
 -- json.lua Copyright (c) 2015 rxi
 local json = loadstring(http.get("https://raw.githubusercontent.com/rxi/json.lua/master/json.lua").readAll())()
-
 --------------------------------------------------------------------------------------
-local url = "http://neverclear.net:55440/api"
+local url = "http://localhost:55440"
+local api = "/api"
 
 local ccdb = {}
 
@@ -18,6 +18,19 @@ local username = nil
 local password = nil
 
 
+---
+-- データベースURLを取得
+-- @return URL
+function ccdb.getUrl()
+  return url
+end
+
+---
+-- データベースURLを設定
+-- @param u URL
+function ccdb.setUrl(u)
+  url = u
+end
 ---
 -- グローバルユーザ名取得
 -- @return ユーザ名
@@ -80,6 +93,19 @@ end
 local function post(url, params, header)
   return getResponse(http.post(url, params, header))
 end
+
+---
+-- テーブルをパラメータへ変換する
+-- @param data テーブル
+-- @return パラメータ文字列
+local function toParam(data)
+  local paramStr = ""
+  for k, v in pairs(data) do
+    paramStr = paramStr .. k .. "=" .. v .. "&"
+  end
+  return string.sub(paramStr, 1, -2)
+end
+
 --------------------------------------------------------------------------
 ---
 -- 正規表現オペレータ生成
@@ -103,7 +129,7 @@ function ccdb.user.insert(name, pass)
   local param =
     "username=" .. name ..
     "&password=" .. pass
-  local h = http.post(url .. "/user/insert/", param)
+  local h = http.post(url .. api .. "/user/insert/", param)
   return json.decode(h.readAll())
 end
 
@@ -118,7 +144,7 @@ function ccdb.user.updatePassword(name, pass, newPass)
     "username=" .. name ..
     "&password=" .. pass ..
     "&newPassword=" .. newPass
-  local h = http.post(url .. "/user/update/", param)
+  local h = http.post(url .. api .. "/user/update/", param)
   return json.decode(h.readAll())
 end
 
@@ -142,7 +168,7 @@ function ccdb.find(collection, query, name, pass)
     "&password=" .. pass ..
     "&collection=" .. collection ..
     "&query=" .. json.encode(query)
-  return get(url .. "/db/find/?" .. param)
+  return get(url .. api .. "/db/find/?" .. param)
 end
 
 ---
@@ -159,7 +185,7 @@ function ccdb.insert(collection, data, name, pass)
     "&password=" .. pass ..
     "&collection=" .. collection ..
     "&data=" .. json.encode(data)
-  return post(url .. "/db/insert/", param)
+  return post(url .. api .. "/db/insert/", param)
 end
 
 ---
@@ -180,7 +206,7 @@ function ccdb.update(collection, selector, data, name, pass)
     "&selector=" .. json.encode(selector) ..
     "&data=" .. json.encode(data)
 
-  return post(url .. "/db/update/", param)
+  return post(url .. api .. "/db/update/", param)
 end
 
 ---
@@ -198,7 +224,7 @@ function ccdb.delete(collection, filter, name, pass)
     "&collection=" .. collection ..
     "&filter=" .. json.encode(filter)
 
-  return post(url .. "/db/delete/", param)
+  return post(url .. api .. "/db/delete/", param)
 end
 
 return ccdb
