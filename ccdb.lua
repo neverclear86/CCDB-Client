@@ -1,5 +1,5 @@
 ---
--- CCDB Client
+-- CCDB Client β0.3
 -- (c) 2017 neverclear
 -- @author neverclear
 --
@@ -116,6 +116,63 @@ function ccdb.regex(regex, option)
   return {["$regex"] = regex, ["$options"] = option}
 end
 
+---
+-- " > num"　大なりオペレータ生成
+-- @param       num     比較する数値
+-- @param[opt]  isEqual true: >=
+-- @return              大なりオペレータ
+function ccdb.gt(num, isEqual)
+  local op = "$gt"
+  if isEqual then
+    op = op .. "e"
+  end
+  return {[op] = num}
+end
+
+---
+-- ">= num"  以上のオペレータ生成
+-- @param num 比較する数値
+-- @return    以上オペレータ
+function ccdb.gte(num)
+  return ccdb.gt(num, true)
+end
+
+---
+-- " < num"　小なりオペレータ生成
+-- @param       num     比較する数値
+-- @param[opt]  isEqual true: <=
+-- @return              小なりオペレータ
+function ccdb.lt(num, isEqual)
+  local op = "$lt"
+  if isEqual then
+    op = op .. "e"
+  end
+  return {[op] = num}
+end
+---
+-- "<= num"  以下のオペレータ生成
+-- @param num 比較する数値
+-- @return    以下オペレータ
+function ccdb.lte(num)
+  return ccdb.lt(num, true)
+end
+
+---
+-- "!=" NotEqualオペレータ生成
+-- @param data  比較データ
+-- @return      NotEqualオペレータ
+function ccdb.not(data)
+  return {["$ne"] = data}
+end
+
+---
+-- "in(...)" inオペレータ生成 (or)
+-- @param ... データリスト
+-- @return    inオペレータ
+function ccdb.in(...)
+  return {["$in"] = {...}}
+end
+
 ---------------------------------------------------------------------------
 
 ccdb.user = {}
@@ -147,10 +204,6 @@ function ccdb.user.updatePassword(name, pass, newPass)
   local h = http.post(url .. api .. "/user/update/", param)
   return json.decode(h.readAll())
 end
-
--- function ccdb.user.delete(name, pass)
---
--- end
 
 --------------------------------------------------------------------------
 
