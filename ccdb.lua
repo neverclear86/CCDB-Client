@@ -78,6 +78,22 @@ local error = {
   }
 }
 
+function ccdb.isSuccess(res)
+  return res.result
+end
+
+function ccdb.getErrorName(res)
+  if res.result == false then
+    return res.detail.name
+  end
+end
+
+function ccdb.getErrorMessage(res)
+  if res.result == false then
+    return res.detail.message
+  end
+end
+
 local function getResponse(h)
   if h then
     return json.decode(h.readAll())
@@ -161,7 +177,7 @@ end
 -- "!=" NotEqualオペレータ生成
 -- @param data  比較データ
 -- @return      NotEqualオペレータ
-function ccdb.not(data)
+function ccdb.ne(data)
   return {["$ne"] = data}
 end
 
@@ -169,7 +185,7 @@ end
 -- "in(...)" inオペレータ生成 (or)
 -- @param ... データリスト
 -- @return    inオペレータ
-function ccdb.in(...)
+function ccdb.any(...)
   return {["$in"] = {...}}
 end
 
@@ -214,14 +230,14 @@ end
 -- @param[opt]  name        ユーザ名
 -- @param[opt]  pass        パスワード
 -- @return                  API Response
-function ccdb.find(collection, query, options, name, pass)
+function ccdb.find(collection, query, sort, name, pass)
   name, pass = getUser(name, pass)
   local param =
     "username=" .. name ..
     "&password=" .. pass ..
     "&collection=" .. collection ..
     "&query=" .. json.encode(query) ..
-    "&options=" .. json.encode(options)
+    "&sort=" .. json.encode(sort)
   return get(url .. api .. "/db/find/?" .. param)
 end
 
@@ -273,8 +289,8 @@ end
 function ccdb.delete(collection, filter, name, pass)
   name, pass = getUser(name, pass)
   local param =
-    "username=" .. username ..
-    "&password=" .. password ..
+    "username=" .. name ..
+    "&password=" .. pass ..
     "&collection=" .. collection ..
     "&filter=" .. json.encode(filter)
 
