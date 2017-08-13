@@ -214,13 +214,14 @@ end
 -- @param[opt]  name        ユーザ名
 -- @param[opt]  pass        パスワード
 -- @return                  API Response
-function ccdb.find(collection, query, name, pass)
+function ccdb.find(collection, query, options, name, pass)
   name, pass = getUser(name, pass)
   local param =
     "username=" .. name ..
     "&password=" .. pass ..
     "&collection=" .. collection ..
-    "&query=" .. json.encode(query)
+    "&query=" .. json.encode(query) ..
+    "&options=" .. json.encode(options)
   return get(url .. api .. "/db/find/?" .. param)
 end
 
