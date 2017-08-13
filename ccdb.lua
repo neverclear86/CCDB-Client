@@ -5,7 +5,13 @@
 --
 
 -- json.lua Copyright (c) 2015 rxi
-local json = loadstring(http.get("https://raw.githubusercontent.com/rxi/json.lua/master/json.lua").readAll())()
+-- local json = loadstring(http.get("https://raw.githubusercontent.com/rxi/json.lua/master/json.lua").readAll())()
+local h = http.get("https://raw.githubusercontent.com/rxi/json.lua/master/json.lua")
+if h == nil then
+  h = fs.open("json.lua", "r")
+end
+local json = loadstring(h.readAll())()
+h = nil
 --------------------------------------------------------------------------------------
 local url = "http://localhost:55440"
 local api = "/api"
